@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-secret:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify secret access
+        env:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
+        run: |
+          if [ -n "$TEST_SECRET" ]; then
+            echo "✅ Secret successfully accessed"
+            exit 0
+          else
+            echo "❌ Secret is empty or not set"
+            exit 1
+          fi
