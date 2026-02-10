@@ -22,3 +22,21 @@ jobs:
             echo "❌ Secret is empty or not set"
             exit 1
           fi
+
+      - name: Set commit status
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            STATE="success"
+          else
+            STATE="failure"
+          fi
+          gh api \
+            --method POST \
+            /repos/${{ github.repository }}/statuses/${{ github.sha }} \
+            -f state="$STATE" \
+            -f target_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -f description="CI check completed" \
+            -f context="CI / test-secret"
